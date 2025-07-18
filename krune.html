@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <title>Love Note for Anoop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Patrick+Hand&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset and basic styles */
+    body {
+      background-color: #fff0f0;
+      font-family: 'Patrick Hand', cursive;
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      position: relative;
+      background: #fff0f0 url('https://www.transparenttextures.com/patterns/hearts.png') repeat;
+    }
+
+    /* Hearts background */
+    .background-hearts {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      opacity: 0.1;
+    }
+
+    /* Realistic envelope container */
+    .envelope {
+      position: relative;
+      width: 250px;
+      height: 160px;
+      cursor: pointer;
+      perspective: 1200px;
+      margin-bottom: 30px;
+    }
+
+    /* Envelope base */
+    .envelope-base {
+      width: 100%;
+      height: 100%;
+      background: #ff7f50;
+      border-radius: 15px;
+      box-shadow:
+        inset 0 8px 12px rgba(255, 255, 255, 0.5),
+        0 6px 15px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Envelope flap */
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(135deg, #ff8f69, #ff5c3c);
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      box-shadow:
+        inset 0 3px 6px rgba(255, 255, 255, 0.8);
+      transform-origin: bottom center;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.5, 1.5, 0.5, 1);
+      z-index: 2;
+      border-bottom: 2px solid #ff4d1e;
+    }
+
+    /* Flap crease line */
+    .envelope-flap::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      height: 15px;
+      background: rgba(255,255,255,0.7);
+      transform: translateX(-50%);
+      box-shadow: 0 0 5px 2px rgba(255,255,255,0.8);
+    }
+
+    /* Open state flap rotation */
+    .envelope.open .envelope-flap {
+      transform: rotateX(-160deg);
+      box-shadow: none;
+      border-bottom: none;
+    }
+
+    /* Envelope text */
+    .envelope-text {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 0 6px #ff6a40;
+      user-select: none;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Message Box */
+    #messageBox {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px 30px 40px;
+      max-width: 420px;
+      border-radius: 20px;
+      background: #ffe5e0;
+      box-shadow: 0 6px 12px rgba(255, 105, 97, 0.5);
+      font-family: 'Patrick Hand', cursive;
+      color: #b84c4c;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Question */
+    #messageBox h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: #ff4d4d;
+      text-shadow: 1px 1px 3px #ffadad;
+    }
+
+    /* Countdown styling */
+    #countdown {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #d94f30;
+      letter-spacing: 0.05em;
+      user-select: text;
+    }
+
+    /* Buttons container */
+    #messageBox > div.buttons {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      width: 100%;
+    }
+
+    /* Yes and No buttons */
+    button {
+      cursor: pointer;
+      font-family: 'Dancing Script', cursive;
+      font-weight: 700;
+      font-size: 22px;
+      padding: 12px 40px;
+      border-radius: 30px;
+      border: none;
+      box-shadow: 0 4px 8px rgba(255, 105, 97, 0.8);
+      transition: background-color 0.3s ease;
+      color: white;
+      user-select: none;
+      position: relative;
+      outline-offset: 2px;
+    }
+
+    button.yes {
+      background: linear-gradient(45deg, #ff6f61, #ff2a1f);
+      text-shadow: 1px 1px 4px #cc1000;
+    }
+
+    button.yes:hover {
+      background: linear-gradient(45deg, #ff917f, #ff4f3b);
+      box-shadow: 0 6px 14px rgba(255, 70, 50, 0.9);
+    }
+
+    button.no {
+      background: #ff9999;
+      color: #700000;
+      font-weight: 800;
+    }
+
+    /* Love Image */
+    #loveImage {
+      max-width: 280px;
+      border-radius: 15px;
+      margin: 25px 0 10px;
+      box-shadow: 0 5px 14px rgba(255, 105, 97, 0.6);
+      display: none;
+      user-select: none;
+    }
+
+    /* Love Text */
+    #loveText {
+      font-family: 'Dancing Script', cursive;
+      font-size: 36px;
+      font-weight: 700;
+      color: #ff2646;
+      text-shadow: 0 0 10px #ff6f6f;
+      display: none;
+      margin-bottom: 10px;
+      user-select: none;
+      animation: fadeInLove 2s ease forwards;
+    }
+
+    @keyframes fadeInLove {
+      from { opacity: 0; transform: scale(0.8);}
+      to { opacity: 1; transform: scale(1);}
+    }
+
+    /* Cute floating note */
+    #cuteNote {
+      max-width: 350px;
+      background: #fff0f0;
+      border: 2px dashed #ff6a5e;
+      border-radius: 20px;
+      font-size: 20px;
+      padding: 20px 25px;
+      color: #b83e3e;
+      font-family: 'Patrick Hand', cursive;
+      animation: floatNote 4s ease-in-out infinite alternate, fadeIn 3s ease forwards;
+      display: none;
+      user-select: none;
+      box-shadow: 0 4px 15px rgba(255, 105, 97, 0.35);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    @keyframes floatNote {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-10px);}
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    /* Fireworks container */
+    #fireworks {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 50;
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="background-hearts"></div>
+
+  <div class="envelope" id="envelope">
+    <div class="envelope-flap"></div>
+    <div class="envelope-base"></div>
+    <div class="envelope-text">Click to Open 💌</div>
+  </div>
+
+  <div id="messageBox">
+    <h2>Do you love Karuna Gooljar? 💖</h2>
+    <div id="countdown"></div>
+    <div class="buttons">
+      <button class="yes" onclick="showLove()">Yes</button>
+      <button class="no" id="noBtn" onmouseover="moveButton(this)">No</button>
+    </div>
+    <img id="loveImage" src="" alt="Love Image" />
+    <div id="loveText">I LOVE YOU PUNKINNNN 💕</div>
+    <div id="cuteNote">
+      Thank you for being the best boyfriend ever and I can't wait to see you tomorrow 💕
+    </div>
+  </div>
+
+  <canvas id="fireworks"></canvas>
+
+  <audio id="chime" src="https://cdn.pixabay.com/audio/2022/03/15/audio_f731fef5bd.mp3"></audio>
+
+  <script>
+    // Envelope open flap animation and message show
+    const envelope = document.getElementById('envelope');
+    const flap = envelope.querySelector('.envelope-flap');
+    const messageBox = document.getElementById('messageBox');
+    const chime = document.getElementById('chime');
+    const fireworksCanvas = document.getElementById('fireworks');
+    const ctx = fireworksCanvas.getContext('2d');
+
+    envelope.addEventListener('click', () => {
+      envelope.classList.add('open');
+      chime.play();
+
+      // After flap opens, hide envelope & show message + start fireworks
+      setTimeout(() => {
+        envelope.style.display = 'none';
+        messageBox.style.display = 'flex';
+        startCountdown();
+        startFireworks();
+      }, 800);
+    });
+
+    // Show love image and messages
+    function showLove() {
+      const loveImg = document.getElementById('loveImage');
+      loveImg.src = 'https://i.imgur.com/hYdtYSX.jpeg'; // Replace with your image URL
+      loveImg.style.display = 'block';
+
+      document.getElementById('loveText').style.display = 'block';
+      document.getElementById('cuteNote').style.display = 'block';
+    }
+
+    // Move "No" button randomly on hover
+    function moveButton(button) {
+      const x = Math.random() * (window.innerWidth - 100);
+      const y = Math.random() * (window.innerHeight - 50);
+      button.style.position = 'absolute';
+      button.style.left = `${x}px`;
+      button.style.top = `${y}px`;
+    }
+
+    // Countdown timer setup
+    function startCountdown() {
+      const countdownEl = document.getElementById('countdown');
+      const countDownDate = new Date("July 18, 2025 18:00:00").getTime();
+
+      const interval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = countDownDate - now;
+
+        if (distance < 0) {
+          clearInterval(interval);
+          countdownEl.textContent = "Can't wait to see you! 💖";
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownEl.innerHTML = `
+          <strong>Countdown to seeing you:</strong><br />
+          ${days}d ${hours}h ${minutes}m ${seconds}s
+        `;
+      }, 1000);
+    }
+
+    // FIREWORKS CODE - basic canvas fireworks
+    fireworksCanvas.width = window.innerWidth;
+    fireworksCanvas.height = window.innerHeight;
+
+    let fireworks = [];
+    let particles = [];
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    class Firework {
+      constructor(sx, sy, tx, ty) {
+        this.x = sx;
+        this.y = sy;
+        this.sx = sx;
+        this.sy = sy;
+        this.tx = tx;
+        this.ty = ty;
+        this.distanceToTarget = dist(sx, sy, tx, ty);
+        this.distanceTraveled = 0;
+        this.coordinates = [];
+        this.coordinateCount = 3;
+        while (this.coordinateCount--) {
+          this.coordinates.push([this.x, this.y]);
+        }
+        this.angle = Math.atan2(ty - sy, tx - sx);
+        this.speed = 5;
+        this.acceleration = 1.05;
+        this.brightness = random(50, 70);
+        this.targetRadius = 8;
+      }
+      update(index) {
+        this.coordinates.pop();
+        this.coordinates.unshift([this.x, this.y]);
+
+        this.speed *= this.acceleration;
+
+        let vx = Math.cos(this.angle) * this.speed;
+        let vy = Math.sin(this.angle) * this.speed;
+        this.distanceTraveled = dist(this.sx, this.sy, this.x + vx, this.y + vy);
+
+        if (this.distanceTraveled >= this.distanceToTarget) {
+          createParticles(this.tx, this.ty);
+          fireworks.splice(index, 1);
+        } else {
+          this.x += vx;
+          this.y += vy;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = `hsl(${random(0, 360)}, 100%, ${this.brightness}%)`;
+        ctx.stroke();
+      }
+    }
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.coordinates = [];
+        this.coordinateCount = 5;
+        while (this.coordinateCount--) {
+          this.coordinates.push([this.x, this.y]);
+        }
+        this.angle = random(0, Math.PI * 2);
+        this.speed = random(1, 10);
+        this.friction = 0.95;
+        this.gravity = 0.7;
+        this.hue = random(0, 360);
+        this.brightness = random(50, 80);
+        this.alpha = 1;
+        this.decay = random(0.015, 0.03);
+      }
+      update(index) {
+        this.coordinates.pop();
+        this.coordinates.unshift([this.x, this.y]);
+        this.speed *= this.friction;
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed + this.gravity;
+        this.alpha -= this.decay;
+
+        if (this.alpha <= 0) {
+          particles.splice(index, 1);
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = `hsla(${this.hue}, 100%, ${this.brightness}%, ${this.alpha})`;
+        ctx.stroke();
+      }
+    }
+
+    function dist(aX, aY, bX, bY) {
+      const x = bX - aX;
+      const y = bY - aY;
+      return Math.sqrt(x * x + y * y);
+    }
+
+    function createParticles(x, y) {
+      let particleCount = 30;
+      while (particleCount--) {
+        particles.push(new Particle(x, y));
+      }
+    }
+
+    function loop() {
+      requestAnimationFrame(loop);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+      ctx.globalCompositeOperation = 'lighter';
+
+      let i = fireworks.length;
+      while (i--) {
+        fireworks[i].draw();
+        fireworks[i].update(i);
+      }
+
+      let j = particles.length;
+      while (j--) {
+        particles[j].draw();
+        particles[j].update(j);
+      }
+    }
+
+    function startFireworks() {
+      fireworksCanvas.style.display = 'block';
+      loop();
+      const intervalId = setInterval(() => {
+        if (fireworks.length > 10) clearInterval(intervalId);
+        const startX = window.innerWidth / 2;
+        const startY = window.innerHeight + 10;
+        const targetX = random(100, window.innerWidth - 100);
+        const targetY = random(100, window.innerHeight / 2);
+        fireworks.push(new Firework(startX, startY, targetX, targetY));
+      }, 400);
+
+      // Stop fireworks after 8 seconds
+      setTimeout(() => {
+        fireworksCanvas.style.display = 'none';
+      }, 8000);
+    }
+
+    // Adjust canvas size on resize
+    window.addEventListener('resize', () => {
+      fireworksCanvas.width = window.innerWidth;
+      fireworksCanvas.height = window.innerHeight;
+    });
+
+    // Initial canvas size
+    fireworksCanvas.width = window.innerWidth;
+    fireworksCanvas.height = window.innerHeight;
+
+  </script>
+
+</body>
+</html>
